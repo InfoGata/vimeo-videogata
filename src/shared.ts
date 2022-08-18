@@ -7,6 +7,12 @@ const AUTH_SCOPE = "https://www.googleapis.com/auth/youtube.readonly";
 const AUTH_URL = "https://accounts.google.com/o/oauth2/auth";
 export const REDIRECT_PATH = "/login_popup.html";
 
+type UiEndVideoType = {
+  type: "endvideo";
+};
+
+export type UiMessageType = UiEndVideoType;
+
 export interface TokenResponse {
   access_token: string;
   expires_in: number;
@@ -41,6 +47,5 @@ export const getToken = async (code: string, redirectUri: string) => {
       "Content-Type": "application/x-www-form-urlencoded",
     },
   });
-  console.log(result);
   return result.data;
 };

@@ -1,4 +1,5 @@
-import Player from "@vimeo/player";
+import Player, { Options } from "@vimeo/player";
+import { UiMessageType } from "./shared";
 
 export const init = () => {
   const params = new URLSearchParams(window.location.search);
@@ -6,15 +7,25 @@ export const init = () => {
   if (apiId) {
     const id = parseInt(apiId);
 
-    const options = {
+    const options: Options = {
       id: id,
       width: 640,
+      autoplay: true,
     };
 
     const player = new Player("player", options);
 
     player.on("play", function () {
-      console.log("played the video!");
+      console.log("playing the video!");
     });
+
+    player.on("ended", () => {
+      console.log("Video ended");
+      sendMessage({ type: "endvideo" });
+    });
+
+    function sendMessage(message: UiMessageType) {
+      parent.postMessage(message, "*");
+    }
   }
 };

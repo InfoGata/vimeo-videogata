@@ -15,8 +15,8 @@
     "videogata-plugin-typings": "../../../libraries/videogata-plugin-typings"
   },
   "scripts": {
-    "build": "parcel build src/index.ts src/options.html src/player.html --dist-dir dist/ --no-source-maps",
-    "start": "parcel src/index.ts src/options.html src/player.html --dist-dir dist/ --no-source-maps"
+    "build": "parcel build src/index.ts src/player.html --dist-dir dist/ --no-source-maps",
+    "start": "parcel src/index.ts src/player.html --dist-dir dist/ --no-source-maps"
   },
   "alias": {
     "react": "preact/compat",

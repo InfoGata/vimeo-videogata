@@ -1,5 +1,6 @@
 import axios from "axios";
 import "videogata-plugin-typings";
+import { UiMessageType } from "./shared";
 import { VimeoVideosResponse } from "./types";
 
 const http = axios.create();
@@ -17,10 +18,18 @@ http.interceptors.request.use(
   }
 );
 
+application.onUiMessage = async (message: UiMessageType) => {
+  switch (message.type) {
+    case "endvideo":
+      application.endVideo();
+      break;
+  }
+};
+
 const searchVideos = async (
   request: SearchRequest
 ): Promise<SearchVideoResult> => {
-  const perPage = 50;
+  const perPage = 20;
   const url = `${apiUrl}/videos`;
   const urlWithQuery = `${url}?per_page=${perPage}&query=${request.query}`;
   const result = await http.get<VimeoVideosResponse>(urlWithQuery);
@@ -29,6 +38,11 @@ const searchVideos = async (
       title: d.name,
       duration: d.duration,
       apiId: d.uri.split("/").pop(),
+      images: d.pictures.sizes.map((s) => ({
+        width: s.width,
+        height: s.height,
+        url: s.link,
+      })),
     })),
   };
 };

@@ -22,4 +22,15 @@ export interface VimeoVideoData {
   duration: number;
   width: number;
   height: number;
+  pictures: VimeoVideoPictures;
+}
+
+export interface VimeoVideoPictures {
+  sizes: VimeoVideoPictureSize[];
+}
+
+export interface VimeoVideoPictureSize {
+  width: number;
+  height: number;
+  link: string;
 }
