@@ -9,7 +9,6 @@ export const init = () => {
 
     const options: Options = {
       id: id,
-      width: 640,
       autoplay: true,
     };
 
@@ -17,6 +16,14 @@ export const init = () => {
 
     player.on("play", function () {
       console.log("playing the video!");
+    });
+
+    player.on("loaded", function () {
+      const frame = document.querySelector("iframe");
+      if (frame !== null) {
+        frame.style.width = "100%";
+        frame.style.height = "100%";
+      }
     });
 
     player.on("ended", () => {
