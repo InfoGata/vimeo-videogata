@@ -27,10 +27,11 @@ application.onUiMessage = async (message: UiMessageType) => {
 };
 
 const vimeoVideoToVideo = (data: VimeoVideoData): Video => {
+  const apiId = data.uri.split("/").pop();
   return {
     title: data.name,
     duration: data.duration,
-    apiId: data.uri.split("/").pop(),
+    apiId: apiId,
     likes: data.metadata.connections.likes.total,
     description: data.description,
     views: data.stats.plays,
@@ -41,6 +42,7 @@ const vimeoVideoToVideo = (data: VimeoVideoData): Video => {
         url: s.link,
       })
     ),
+    originalUrl: `https://vimeo.com/${apiId}`,
   };
 };
 
