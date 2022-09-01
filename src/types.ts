@@ -23,6 +23,24 @@ export interface VimeoVideoData {
   width: number;
   height: number;
   pictures: VimeoVideoPictures;
+  metadata: VimeoVideoMetadata;
+  stats: VimeoVideoStats;
+}
+
+export interface VimeoVideoStats {
+  plays: number;
+}
+
+export interface VimeoVideoMetadata {
+  connections: VimeoMetadataConnections;
+}
+
+export interface VimeoMetadataConnections {
+  likes: VimeoConnectionsLikes;
+}
+
+export interface VimeoConnectionsLikes {
+  total: number;
 }
 
 export interface VimeoVideoPictures {

@@ -1,7 +1,7 @@
 import axios from "axios";
 import "videogata-plugin-typings";
 import { UiMessageType } from "./shared";
-import { VimeoVideosResponse } from "./types";
+import { VimeoVideoData, VimeoVideosResponse } from "./types";
 
 const http = axios.create();
 
@@ -26,6 +26,30 @@ application.onUiMessage = async (message: UiMessageType) => {
   }
 };
 
+const vimeoVideoToVideo = (data: VimeoVideoData): Video => {
+  return {
+    title: data.name,
+    duration: data.duration,
+    apiId: data.uri.split("/").pop(),
+    likes: data.metadata.connections.likes.total,
+    description: data.description,
+    views: data.stats.plays,
+    images: data.pictures.sizes.map(
+      (s): ImageInfo => ({
+        width: s.width,
+        height: s.height,
+        url: s.link,
+      })
+    ),
+  };
+};
+
+const getVideo = async (request: GetVideoRequest): Promise<Video> => {
+  const url = `${apiUrl}/videos/${request.apiId}`;
+  const result = await http.get<VimeoVideoData>(url);
+  return vimeoVideoToVideo(result.data);
+};
+
 const searchVideos = async (
   request: SearchRequest
 ): Promise<SearchVideoResult> => {
@@ -34,16 +58,7 @@ const searchVideos = async (
   const urlWithQuery = `${url}?per_page=${perPage}&query=${request.query}`;
   const result = await http.get<VimeoVideosResponse>(urlWithQuery);
   return {
-    items: result.data.data.map((d) => ({
-      title: d.name,
-      duration: d.duration,
-      apiId: d.uri.split("/").pop(),
-      images: d.pictures.sizes.map((s) => ({
-        width: s.width,
-        height: s.height,
-        url: s.link,
-      })),
-    })),
+    items: result.data.data.map(vimeoVideoToVideo),
   };
 };
 
@@ -55,7 +70,4 @@ const searchAll = async (request: SearchRequest): Promise<SearchAllResult> => {
 
 application.onSearchAll = searchAll;
 application.onSearchVideos = searchVideos;
-
-const init = () => {};
-
-init();
+application.onGetVideo = getVideo;
