@@ -1,15 +1,22 @@
 import axios from "axios";
 import "videogata-plugin-typings";
-import { UiMessageType } from "./shared";
+import { MessageType, UiMessageType } from "./shared";
 import { VimeoVideoData, VimeoVideosResponse } from "./types";
 
 const http = axios.create();
 
 const apiUrl = "https://api.vimeo.com";
 
+const getAccessToken = (): string => {
+  // Unauthenticated token with public scope
+  const defaultToken = "c2276962367652679c309e1bb60167b7";
+  const token = localStorage.getItem("accessToken");
+  return token ?? defaultToken;
+};
+
 http.interceptors.request.use(
   (config) => {
-    const token = "c2276962367652679c309e1bb60167b7";
+    const token = getAccessToken();
     config.headers["Authorization"] = "bearer " + token;
     return config;
   },
@@ -62,6 +69,30 @@ const searchVideos = async (
   return {
     items: result.data.data.map(vimeoVideoToVideo),
   };
+};
+
+const sendMessage = (message: MessageType) => {
+  application.postUiMessage(message);
+};
+
+const sendInfo = async () => {
+  const accessToken = localStorage.getItem("accessToken") ?? "";
+  sendMessage({
+    type: "send-info",
+    accessToken,
+  });
+};
+
+application.onUiMessage = async (message: UiMessageType) => {
+  switch (message.type) {
+    case "get-info":
+      await sendInfo();
+      break;
+    case "set-keys":
+      localStorage.setItem("accessToken", message.accessToken);
+      application.createNotification({ message: "Api keys Saved!" });
+      break;
+  }
 };
 
 const searchAll = async (request: SearchRequest): Promise<SearchAllResult> => {
