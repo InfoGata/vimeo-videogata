@@ -63,11 +63,19 @@ const searchVideos = async (
   request: SearchRequest
 ): Promise<SearchVideoResult> => {
   const perPage = 20;
+  const offset = request.page?.offset || 0;
+  const page = offset / perPage + 1;
   const url = `${apiUrl}/videos`;
-  const urlWithQuery = `${url}?per_page=${perPage}&query=${request.query}`;
+  const urlWithQuery = `${url}?per_page=${perPage}&query=${request.query}&page=${page}`;
   const result = await http.get<VimeoVideosResponse>(urlWithQuery);
+  const pageInfo: PageInfo = {
+    offset,
+    resultsPerPage: perPage,
+    totalResults: result.data.total,
+  };
   return {
     items: result.data.data.map(vimeoVideoToVideo),
+    pageInfo,
   };
 };
 
