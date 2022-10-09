@@ -63,7 +63,7 @@ const searchVideos = async (
   request: SearchRequest
 ): Promise<SearchVideoResult> => {
   const perPage = 20;
-  const offset = request.page?.offset || 0;
+  const offset = request.pageInfo?.offset || 0;
   const page = offset / perPage + 1;
   const url = `${apiUrl}/videos`;
   const urlWithQuery = `${url}?per_page=${perPage}&query=${request.query}&page=${page}`;
