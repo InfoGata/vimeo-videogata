@@ -1,3 +1,5 @@
 # vimeo-videogata
 
-A [videogata](https://www.videogata.com) plugin for playing vimeo videos.
+A [videogata](https://github.com/InfoGata/videogata) plugin for playing vimeo videos.
+
+[Installation Link](https://cdn.jsdelivr.net/gh/InfoGata/vimeo-videogata@latest/manifest.json)
