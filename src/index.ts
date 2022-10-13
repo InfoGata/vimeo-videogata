@@ -1,5 +1,4 @@
 import axios from "axios";
-import "videogata-plugin-typings";
 import { MessageType, UiMessageType } from "./shared";
 import { VimeoVideoData, VimeoVideosResponse } from "./types";
 
