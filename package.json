@@ -5,14 +5,14 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@emotion/react": "^11.7.1",
-    "@emotion/styled": "^11.6.0",
-    "@mui/icons-material": "^5.10.3",
-    "@mui/material": "5.1.0",
+    "@emotion/react": "^11.10.4",
+    "@emotion/styled": "^11.10.4",
+    "@mui/icons-material": "^5.10.9",
+    "@mui/material": "^5.10.9",
     "@types/vimeo__player": "^2.16.3",
     "@vimeo/player": "^2.17.1",
     "axios": "^0.21.1",
-    "preact": "^10.8.2",
+    "preact": "^10.11.2",
     "@infogata/videogata-plugin-typings": "1.0.2"
   },
   "scripts": {
