@@ -24,14 +24,6 @@ http.interceptors.request.use(
   }
 );
 
-application.onUiMessage = async (message: UiMessageType) => {
-  switch (message.type) {
-    case "endvideo":
-      application.endVideo();
-      break;
-  }
-};
-
 const vimeoVideoToVideo = (data: VimeoVideoData): Video => {
   const apiId = data.uri.split("/").pop();
   return {
@@ -98,6 +90,12 @@ application.onUiMessage = async (message: UiMessageType) => {
     case "set-keys":
       localStorage.setItem("accessToken", message.accessToken);
       application.createNotification({ message: "Api keys Saved!" });
+      break;
+    case "endvideo":
+      application.endVideo();
+      break;
+    default:
+      const _exhaustive: never = message;
       break;
   }
 };

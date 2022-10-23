@@ -31,6 +31,9 @@ const App: FunctionComponent = () => {
             setShowAdvanced(true);
           }
           break;
+        default:
+          const _exhaustive: never = event.data.type;
+          break;
       }
     };
     window.addEventListener("message", onMessage);
