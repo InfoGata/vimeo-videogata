@@ -1,8 +1,17 @@
-import axios from "axios";
+import ky from "ky";
 import { MessageType, UiMessageType } from "./shared";
 import { VimeoVideoData, VimeoVideosResponse } from "./types";
 
-const http = axios.create();
+const http = ky.create({
+  hooks: {
+    beforeRequest: [
+      (request) => {
+        const token = getAccessToken();
+        request.headers.set("Authorization", "bearer " + token);
+      },
+    ],
+  },
+});
 
 const apiUrl = "https://api.vimeo.com";
 
@@ -12,17 +21,6 @@ const getAccessToken = (): string => {
   const token = localStorage.getItem("accessToken");
   return token ?? defaultToken;
 };
-
-http.interceptors.request.use(
-  (config) => {
-    const token = getAccessToken();
-    config.headers["Authorization"] = "bearer " + token;
-    return config;
-  },
-  (error) => {
-    Promise.reject(error);
-  }
-);
 
 const vimeoVideoToVideo = (data: VimeoVideoData): Video => {
   const apiId = data.uri.split("/").pop();
@@ -46,8 +44,8 @@ const vimeoVideoToVideo = (data: VimeoVideoData): Video => {
 
 const getVideo = async (request: GetVideoRequest): Promise<Video> => {
   const url = `${apiUrl}/videos/${request.apiId}`;
-  const result = await http.get<VimeoVideoData>(url);
-  return vimeoVideoToVideo(result.data);
+  const result = await http.get<VimeoVideoData>(url).json();
+  return vimeoVideoToVideo(result);
 };
 
 const searchVideos = async (
@@ -58,14 +56,14 @@ const searchVideos = async (
   const page = offset / perPage + 1;
   const url = `${apiUrl}/videos`;
   const urlWithQuery = `${url}?per_page=${perPage}&query=${request.query}&page=${page}`;
-  const result = await http.get<VimeoVideosResponse>(urlWithQuery);
+  const result = await http.get<VimeoVideosResponse>(urlWithQuery).json();
   const pageInfo: PageInfo = {
     offset,
     resultsPerPage: perPage,
-    totalResults: result.data.total,
+    totalResults: result.total,
   };
   return {
-    items: result.data.data.map(vimeoVideoToVideo),
+    items: result.data.map(vimeoVideoToVideo),
     pageInfo,
   };
 };
