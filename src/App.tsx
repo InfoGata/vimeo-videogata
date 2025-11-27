@@ -1,26 +1,21 @@
+import { useEffect, useState } from "preact/hooks";
 import {
   Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Box,
-  Button,
-  CssBaseline,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { FunctionComponent } from "preact";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useEffect, useState } from "preact/hooks";
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "./components/ui/accordion";
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
 import { MessageType, UiMessageType } from "./shared";
 
 const sendUiMessage = (message: UiMessageType) => {
   parent.postMessage(message, "*");
 };
 
-const App: FunctionComponent = () => {
+const App = () => {
   const [accessToken, setAccessToken] = useState("");
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [openItem, setOpenItem] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const onMessage = (event: MessageEvent<MessageType>) => {
@@ -28,7 +23,7 @@ const App: FunctionComponent = () => {
         case "send-info":
           setAccessToken(event.data.accessToken);
           if (event.data.accessToken) {
-            setShowAdvanced(true);
+            setOpenItem("item-1");
           }
           break;
         default:
@@ -56,43 +51,37 @@ const App: FunctionComponent = () => {
     });
   };
 
-  const onAccordionChange = (_: any, expanded: boolean) => {
-    setShowAdvanced(expanded);
-  };
   return (
-    <Box>
-      <CssBaseline />
-      <Accordion expanded={showAdvanced} onChange={onAccordionChange}>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1d-content"
-          id="panel1d-header"
-        >
-          <Typography>Advanced Configuration</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>Use your own Access Token:</Typography>
-          <div>
-            <TextField
-              label="Access Token"
-              value={accessToken}
-              onChange={(e) => {
-                const value = e.currentTarget.value;
-                setAccessToken(value);
-              }}
-            />
-          </div>
-          <Stack spacing={2} direction="row">
-            <Button variant="contained" onClick={onSaveKeys}>
-              Save
-            </Button>
-            <Button variant="contained" onClick={onClearKeys} color="error">
-              Clear
-            </Button>
-          </Stack>
-        </AccordionDetails>
+    <div className="flex flex-col gap-2 mx-4">
+      <Accordion
+        type="single"
+        collapsible
+        value={openItem}
+        onValueChange={setOpenItem}
+      >
+        <AccordionItem value="item-1">
+          <AccordionTrigger>Advanced Configuration</AccordionTrigger>
+          <AccordionContent>
+            <div className="flex flex-col gap-2 space-y-2 p-1">
+              <p className="text-sm">Use your own Access Token:</p>
+              <Input
+                placeholder="Access Token"
+                value={accessToken}
+                onChange={(e: any) => {
+                  setAccessToken((e.target as HTMLInputElement).value);
+                }}
+              />
+              <div className="flex gap-2">
+                <Button onClick={onSaveKeys}>Save</Button>
+                <Button variant="destructive" onClick={onClearKeys}>
+                  Clear
+                </Button>
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
       </Accordion>
-    </Box>
+    </div>
   );
 };
 

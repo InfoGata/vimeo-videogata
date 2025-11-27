@@ -1,18 +1,7 @@
-import { createTheme, ThemeProvider } from "@mui/material";
 import { render } from "preact";
 import App from "./App";
-
-const theme = createTheme({
-  palette: {
-    mode: "dark",
-  },
-});
+import { ThemeProvider } from "@infogata/shadcn-vite-theme-provider";
 
 export const init = () => {
-  render(
-    <ThemeProvider theme={theme}>
-      <App />
-    </ThemeProvider>,
-    document.body
-  );
+  render(<ThemeProvider><App /></ThemeProvider>, document.body);
 };

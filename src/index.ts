@@ -104,6 +104,13 @@ const searchAll = async (request: SearchRequest): Promise<SearchAllResult> => {
   return { videos };
 };
 
+const changeTheme = (theme: Theme) => {
+  localStorage.setItem("vite-ui-theme", theme);
+};
+application.onChangeTheme = async (theme: Theme) => {
+  changeTheme(theme);
+};
+
 application.onSearchAll = searchAll;
 application.onSearchVideos = searchVideos;
 application.onGetVideo = getVideo;
