@@ -1,4 +1,5 @@
-import Player, { Options } from "@vimeo/player";
+import Player from "@vimeo/player";
+import type { VimeoEmbedParameters } from "@vimeo/player/types/formats";
 import { UiMessageType } from "./shared";
 
 export const init = () => {
@@ -7,7 +8,7 @@ export const init = () => {
   if (apiId) {
     const id = parseInt(apiId);
 
-    const options: Options = {
+    const options: VimeoEmbedParameters = {
       id: id,
       autoplay: true,
     };
