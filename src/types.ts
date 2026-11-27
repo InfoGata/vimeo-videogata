@@ -52,3 +52,21 @@ export interface VimeoVideoPictureSize {
   height: number;
   link: string;
 }
+
+export interface VimeoFeedResponse {
+  total: number;
+  page: number;
+  per_page: number;
+  paging: VimeoPaging;
+  data: VimeoFeedItem[];
+}
+
+/**
+ * One activity in the user's feed (an upload, like, share, ...). `clip` is the
+ * video it is about; it is typed optional because not every activity type is
+ * guaranteed to carry one.
+ */
+export interface VimeoFeedItem {
+  type: string;
+  clip?: VimeoVideoData;
+}

@@ -1,6 +1,10 @@
 import ky from "ky";
 import { MessageType, UiMessageType } from "./shared";
-import { VimeoVideoData, VimeoVideosResponse } from "./types";
+import {
+  VimeoFeedResponse,
+  VimeoVideoData,
+  VimeoVideosResponse,
+} from "./types";
 
 const http = ky.create({
   hooks: {
@@ -14,6 +18,21 @@ const http = ky.create({
 });
 
 const apiUrl = "https://api.vimeo.com";
+const perPage = 20;
+
+/**
+ * Only what `vimeoVideoToVideo` reads. Vimeo's full video objects are large
+ * (embed html, every file rendition, upload settings), so ask for less.
+ */
+const videoFields = [
+  "uri",
+  "name",
+  "description",
+  "duration",
+  "pictures.sizes",
+  "stats.plays",
+  "metadata.connections.likes.total",
+];
 
 const getAccessToken = (): string => {
   // Unauthenticated token with public scope
@@ -68,6 +87,66 @@ const searchVideos = async (
   };
 };
 
+const pageFromRequest = (pageInfo?: PageInfo) => {
+  const offset = pageInfo?.offset || 0;
+  return { offset, page: offset / perPage + 1 };
+};
+
+/**
+ * Vimeo Staff Picks, newest first. Works with the default public-scope token,
+ * so Home has something to show without any setup.
+ */
+const getTopItems = async (): Promise<SearchAllResult> => {
+  const params = new URLSearchParams({
+    per_page: String(perPage),
+    sort: "date",
+    fields: videoFields.join(","),
+  });
+  const url = `${apiUrl}/channels/staffpicks/videos?${params}`;
+  const result = await http.get<VimeoVideosResponse>(url).json();
+  return {
+    videos: {
+      items: result.data.map(vimeoVideoToVideo),
+      pageInfo: {
+        offset: 0,
+        resultsPerPage: perPage,
+        totalResults: result.total,
+      },
+    },
+  };
+};
+
+/**
+ * The videos in the user's own feed on vimeo.com. Needs a personal access token
+ * with the "private" scope set in the options; with only the default token
+ * there is no user, so return nothing and let Home fall back to Staff Picks.
+ */
+const getUserFeed = async (
+  request: UserFeedRequest
+): Promise<SearchVideoResult> => {
+  if (!localStorage.getItem("accessToken")) return { items: [] };
+
+  const { offset, page } = pageFromRequest(request.pageInfo);
+  const params = new URLSearchParams({
+    per_page: String(perPage),
+    page: String(page),
+    fields: ["type", ...videoFields.map((f) => `clip.${f}`)].join(","),
+  });
+  const url = `${apiUrl}/me/feed?${params}`;
+  const result = await http.get<VimeoFeedResponse>(url).json();
+  return {
+    items: result.data
+      .map((item) => item.clip)
+      .filter((clip): clip is VimeoVideoData => !!clip)
+      .map(vimeoVideoToVideo),
+    pageInfo: {
+      offset,
+      resultsPerPage: perPage,
+      totalResults: result.total,
+    },
+  };
+};
+
 const sendMessage = (message: MessageType) => {
   application.postUiMessage(message);
 };
@@ -114,3 +193,5 @@ application.onChangeTheme = async (theme: Theme) => {
 application.onSearchAll = searchAll;
 application.onSearchVideos = searchVideos;
 application.onGetVideo = getVideo;
+application.onGetTopItems = getTopItems;
+application.onGetUserFeed = getUserFeed;
