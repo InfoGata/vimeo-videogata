@@ -2,7 +2,7 @@
   "id": "MLWVs6Y6j3EI6mT76Jo-S",
   "name": "Plugin for Vimeo",
   "alias": "vimeo",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "script": "dist/index.js",
   "options": "dist/options.html",
   "player": "dist/player.html",
